@@ -1,16 +1,9 @@
-* Wireless network
-	rfkill list
-	wifi-menu -o
-
-* Update clock
-	timedatectl set-ntp true
-
 * Mount partitions
 	mount /dev/sdaX /mnt
 	mkdir -p /mnt/{boot,mnt/{bucket,windows}}
 	mount /dev/sdaY /mnt/boot
 	mount /dev/sdaZ /mnt/mnt/bucket
-	mount /dev/sdaW /mnt/mnt/winsows
+	mount /dev/sdaW /mnt/mnt/windows
 
 * Mirrors
 	cd /etc/pacman.d
@@ -19,103 +12,97 @@
 	rankmirrors -n 4 mirrorlist.b > mirrorlist
 	pacman -Syy
 
-* Base packages
-	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g 
+* Install base
+	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g gvim
 
 * fstab
 	genfstab -U /mnt > /mnt/etc/fstab
-	x-gvfs-show
 
-* Start config
+* Configuration
 	arch-chroot /mnt /bin/bash
-
-* Locale
-	vi /etc/locale.gen
+	
+	vim /etc/locale.gen
 	locale-gen
 	locale > /etc/locale.conf
 
-* Time
 	ln -sf /usr/share/zoneinfo/America/Recife /etc/localtime
 	hwclock -wu
 
+	vim /etc/pacman.conf
+		[archlinuxfr]
+		SigLevel = Never
+		Server = http://repo.archlinux.fr/$arch
+	pacman -Syy
+
+	passwd
+	useradd -m -G wheel jonatas
+	passwd jonatas
+	EDITOR=vim visudo
+
+	echo name > /etc/hostname
+	vim /etc/hosts
+
+	systemctl enable fstrim.timer
+	vim /etc/udev/rules.d/60-schedulers.rules
+		ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="deadline"
+
 * Bootloader
 	bootctl install
-	vi /boot/loader/entries/arch.conf
+	vim /boot/loader/entries/arch.conf
 		title	Arch Linux
 		linux	/vmlinuz-linux
 		initrd	/intel-ucode.img
 		initrd	/initramfs-linux.img
 		options	root=PARTLABEL=arch rw
-	vi /boot/loader/loader.conf
-		timeout 3
-		default	arch
+	vim /boot/loader/loader.conf
+		timeout	3
+		default arch
 
-* Pacman
-	vi /etc/pacman.conf
-		[multilib]
-		[archlinuxfr]
-			SigLevel = Never
-			Server = http://repo.archlinux.fr/$arch
-	pacman -Syy
-
-* User
-	passwd
-	useradd -m -G wheel jonatas
-	passwd jonatas
-	EDITOR=vi visudo
-
-* TRIM
-	systemctl enable fstrim.timer
-	vi /etc/udev/rules.d/60-schedulers.rules
-		# set deadline scheduler for non-rotating disks
-		ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="deadline"
-
-* Desktop
-	pacman -S xorg-server xorg-server-utils xorg-xinit
-	- intel
-		pacman -S xf86-video-intel lib32-mesa-libgl libva-intel-driver libva xf86-input-synaptics
-	- nvidia
-		pacman -S nvidia lib32-nvidia-libgl
-	pacman -S gnome
-	systemctl enable gdm
-
-* Network
-	echo name > /etc/hostname
-	vi /etc/hosts
-	systemctl enable NetworkManager.service 
-
-* Finish
+* Wireless
+	pacman -S git linux-headers
+	mkdir /opt/rtl8723au
+	git clone https://github.com/lwfinger/rtl8723au.git /opt/rtl8723au
 	exit
 	umount -R /mnt
 	reboot
+	cd /opt/rtl8723au
+	make
+	make install
+	vim /etc/modprobe.d/r8723au.conf
+		blacklist	r8723au
+	reboot
+	
+* Desktop
+	pacman -S xorg-server xorg-xinit
+	- intel
+		pacman -S xf86-video-intel lib32-mesa-libgl libva xf86-input-synaptics
+	-nvidia
+		pacman -S nvidia lib32-nvidia-libgl
+	pacman -S gnome
+	systemctl enable gdm
+	systemctl enable NetworkManager.service
 
 * Software
-	sudo pacman -S gvim zsh zsh-completions yaourt wget vlc clang qt5-base qtcreator lldb numix-themes gnome-tweak-tool file-roller transmission-gtk
-	yaourt google-chrome profile-sync-daemon numix-circle-icon-theme
-	sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+	pacman -S zsh zsh-completions yaourt wget gnome-tweak-tool file-roller transmission-gtk firefox mpv steam flashplugin guake
+
+* Pos-install
+	yaourt profile-sync-daemon
+	- tablet
+		yaourt iio-sensor-proxy
+	sh -c "wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 	git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
 
-* Wireless driver
-	sudo pacman -S git {linux-headers}
-	sudo mkdir /opt/rtl8723au
-	sudo git clone https://github.com/lwfinger/rtl8723au.git /opt/rtl8723au
-	sudo cd /opt/rtl8723au
-	sudo make
-	sudo make install
-	vim /etc/modprobe.d/r8723au.conf
-		blacklist r8723au
+	mkdir .config/google-chrome/Default/cache
+	mv .cache/google-chrome/Default .config/google-chrome/Default/cache
+	ln -s .config/google-chrome/Default/cache/Default .cache/google-chrome/Default
 
-* Screen rotation
-	yaourt iio-sensor-proxy
+	mkdir .mozilla/firefox/2cu9sf8i.default/cache
+	mv .cache/mozilla/firefox/2cu9sf8i.default .mozilla/firefox/2cu9sf8i.default/cache
+	ln -s .mozilla/firefox/2cu9sf8i.default/cache/2cu9sf8i.default .cache/mozilla/firefox/2cu9sf8i.default
 
-* tmpfs
-	profile
-		mkdir .config/google-chrome/Default/cache
-		mv .cache/google-chrome/Default .config/google-chrome/Default/cache
-		ln -s .config/google-chrome/Default/cache/Default .cache/google-chrome/Default
-		psd
-		vim .config/psd/psd.conf
-		sudo visudo
-			jonatas ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
-		systemctl --user enable psd.service
+	psd
+	vim .config/psd/psd.conf
+	sudo visudo
+		jonatas ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
+	systemctl --user enable psd.service
 
