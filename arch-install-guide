@@ -13,7 +13,7 @@
 	pacman -Syy
 
 * Install base
-	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g gvim
+	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g vim
 
 * fstab
 	genfstab -U /mnt > /mnt/etc/fstab
@@ -28,12 +28,6 @@
 	ln -sf /usr/share/zoneinfo/America/Recife /etc/localtime
 	hwclock -wu
 
-	vim /etc/pacman.conf
-		[archlinuxfr]
-		SigLevel = Never
-		Server = http://repo.archlinux.fr/$arch
-	pacman -Syy
-
 	passwd
 	useradd -m -G wheel jonatas
 	passwd jonatas
@@ -42,35 +36,32 @@
 	echo name > /etc/hostname
 	vim /etc/hosts
 
+	pacman -Syy
+	pacman -S git
+	git clone https://github.com/jonatascmedeiros/dotfiles.git /home/jonatas/
+	cp /home/jonatas/dotfiles/pacman.conf /etc/
+	pacman -Syy
+  
 	systemctl enable fstrim.timer
-	vim /etc/udev/rules.d/60-schedulers.rules
-		ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="deadline"
+	cp /home/jonatas/dotfiles/60-schedulers.rules /etc/udev/rules.d/
 
 * Bootloader
 	bootctl install
-	vim /boot/loader/entries/arch.conf
-		title	Arch Linux
-		linux	/vmlinuz-linux
-		initrd	/intel-ucode.img
-		initrd	/initramfs-linux.img
-		options	root=PARTLABEL=arch rw
+	cp /home/jonatas/dotfiles/arch.conf /boot/loader/entries/
 	vim /boot/loader/loader.conf
 		timeout	3
 		default arch
 
 * Wireless
-	pacman -S git linux-headers
+	pacman -S linux-headers
 	mkdir /opt/rtl8723au
 	git clone https://github.com/lwfinger/rtl8723au.git /opt/rtl8723au
-	exit
-	umount -R /mnt
-	reboot
+	--
 	cd /opt/rtl8723au
 	make
 	make install
 	vim /etc/modprobe.d/r8723au.conf
 		blacklist	r8723au
-	reboot
 	
 * Desktop
 	pacman -S xorg-server xorg-xinit
@@ -78,27 +69,33 @@
 		pacman -S xf86-video-intel lib32-mesa-libgl libva xf86-input-synaptics
 	-nvidia
 		pacman -S nvidia lib32-nvidia-libgl
-	pacman -S gnome
-	systemctl enable gdm
-	systemctl enable NetworkManager.service
+	pacman -S i3 rxvt-unicode rofi alsa-utils
+	cp /home/jonatas/dotfiles/.xinitrc /home/jonatas/
+	alsamixer
 
 * Software
-	pacman -S zsh zsh-completions yaourt wget gnome-tweak-tool file-roller transmission-gtk firefox mpv steam flashplugin guake
+	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin 
+
+* Finish
+	exit
+	umount -R /mnt
+	reboot
 
 * Pos-install
-	yaourt profile-sync-daemon
-	- tablet
-		yaourt iio-sensor-proxy
+	+ as root
+		wifi-menu -o
+		systemctl enable netctl-auto@wlp0s20u5i2.service
+		yaourt iio-sync-daemon
+
 	sh -c "wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 	git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+* psd
+	yaourt profile-sync-daemon
 
 	mkdir .config/google-chrome/Default/cache
 	mv .cache/google-chrome/Default .config/google-chrome/Default/cache
 	ln -s .config/google-chrome/Default/cache/Default .cache/google-chrome/Default
-
-	mkdir .mozilla/firefox/2cu9sf8i.default/cache
-	mv .cache/mozilla/firefox/2cu9sf8i.default .mozilla/firefox/2cu9sf8i.default/cache
-	ln -s .mozilla/firefox/2cu9sf8i.default/cache/2cu9sf8i.default .cache/mozilla/firefox/2cu9sf8i.default
 
 	psd
 	vim .config/psd/psd.conf
