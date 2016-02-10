@@ -31,14 +31,13 @@
 	passwd
 	useradd -m -G wheel jonatas
 	passwd jonatas
-	EDITOR=vim visudo
+	visudo
 
 	echo name > /etc/hostname
 	vim /etc/hosts
 
-	pacman -Syy
 	pacman -S git
-	git clone https://github.com/jonatascmedeiros/dotfiles.git /home/jonatas/
+	git clone https://github.com/jonatascmedeiros/dotfiles.git /home/jonatas/dotfiles
 	cp /home/jonatas/dotfiles/pacman.conf /etc/
 	pacman -Syy
   
@@ -53,7 +52,7 @@
 		default arch
 
 * Wireless
-	pacman -S linux-headers
+	pacman -S linux-headers dialog wpa_actiond
 	mkdir /opt/rtl8723au
 	git clone https://github.com/lwfinger/rtl8723au.git /opt/rtl8723au
 	--
@@ -62,30 +61,30 @@
 	make install
 	vim /etc/modprobe.d/r8723au.conf
 		blacklist	r8723au
+		blacklist	rtl8xxxu
 	
 * Desktop
 	pacman -S xorg-server xorg-xinit
 	- intel
-		pacman -S xf86-video-intel lib32-mesa-libgl libva xf86-input-synaptics
+		pacman -S xf86-video-intel lib32-mesa-libgl libva-intel-driver libva xf86-input-synaptics
 	-nvidia
 		pacman -S nvidia lib32-nvidia-libgl
 	pacman -S i3 rxvt-unicode rofi alsa-utils
 	cp /home/jonatas/dotfiles/.xinitrc /home/jonatas/
 	alsamixer
+	systemctl enable netctl-auto@interface.service #interface
 
 * Software
-	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin 
+	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin tmux 
 
 * Finish
 	exit
+	cp /etc/netctl/profile /mnt/etc/netctl/ #profile
 	umount -R /mnt
 	reboot
 
 * Pos-install
-	+ as root
-		wifi-menu -o
-		systemctl enable netctl-auto@wlp0s20u5i2.service
-		yaourt iio-sync-daemon
+	yaourt iio-sync-daemon
 
 	sh -c "wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 	git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
