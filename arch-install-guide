@@ -70,14 +70,17 @@
 	-nvidia
 		pacman -S nvidia lib32-nvidia-libgl
 	pacman -S i3 xfce4-terminal rofi
-	cp /home/jonatas/dotfiles/.* /home/jonatas/
 	mkdir -p /home/jonatas/.config/i3
-	cp /home/jonatas/dotfiles/.i3config /home/jonatas/.config/i3/config
+	cd /home/jonatas/dotfiles
+	cp i3config toggle_touchpad.sh ../.config/i3/
+	mv ../.config/i3/i3config ../.config/i3/config
+	cp .xinitrc .X* ../
+	chown -R jonatas /home/joantas/dotfiles
 	alsamixer
 	systemctl enable netctl-auto@interface.service #interface
 
 * Software
-	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin tmux powerline powerline-fonts
+	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin tmux powerline powerline-fonts feh lxappearance compton ttf-font-awesome ttf-inconsolata
 
 * Finish
 	exit
@@ -86,7 +89,8 @@
 	reboot
 
 * Pos-install
-	yaourt iio-sync-daemon
+	sudo pacman -S gnome-common # for iio-sensor
+	yaourt iio-sensor-proxy
 
 	sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 	git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
