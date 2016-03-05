@@ -167,9 +167,9 @@ client.focused_inactive	$b03	$b03		$b00	$green
 client.urgent		$b03	$red		$base1	$green
 
 # Pulse Audio controls
-bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 1 +5% # increase sound volume
-bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 1 -5% # decrease sound volume
-bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 1 toggle # mute sound
+bindsym XF86AudioRaiseVolume exec --no-startup-id pactl set-sink-volume 0 +5% # increase sound volume
+bindsym XF86AudioLowerVolume exec --no-startup-id pactl set-sink-volume 0 -5% # decrease sound volume
+bindsym XF86AudioMute exec --no-startup-id pactl set-sink-mute 0 toggle # mute sound
 
 # Screen brightness control
 bindsym XF86MonBrightnessUp exec xbacklight -inc 5 # increase screen brightness
@@ -179,7 +179,7 @@ bindsym XF86MonBrightnessDown exec xbacklight -dec 5 # decrease screen brightnes
 bindsym XF86TouchpadOn exec /home/jonatas/.config/i3/toggle_touchpad.sh
 
 # start rofi
-bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 100 -padding 345 -opacity 85 -bw 0 -bc "$b03" -bg "$b03" -fg "$base0" -hlbg "$b03" -hlfg "$base2" -font "Noto Sans 18"
+bindsym $mod+d exec rofi -show run -lines 3 -eh 2 -width 100 -padding 420 -opacity 85 -bw 0 -bc "$b03" -bg "$b03" -fg "$base0" -hlbg "$b03" -hlfg "$base2" -font "Noto Sans 18"
 
 exec_always --no-startup-id feh --bg-scale /home/jonatas/.wallpaper.jpg
 exec_always --no-startup-id xrandr --output HDMI1 --off --output VIRTUAL1 --off --output eDP1 --mode 1366x768 --pos 0x0 --rotate normal 

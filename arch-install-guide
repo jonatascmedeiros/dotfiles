@@ -13,7 +13,7 @@
 	pacman -Syy
 
 * Install base
-	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g vim
+	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g gvim
 
 * fstab
 	genfstab -U /mnt > /mnt/etc/fstab
@@ -38,15 +38,16 @@
 
 	pacman -S git
 	git clone https://github.com/jonatascmedeiros/dotfiles.git /home/jonatas/dotfiles
-	cp /home/jonatas/dotfiles/pacman.conf /etc/
+	cd /home/jonatas/dotfiles/
+	cp pacman.conf /etc/
 	pacman -Syy
   
 	systemctl enable fstrim.timer
-	cp /home/jonatas/dotfiles/60-schedulers.rules /etc/udev/rules.d/
+	cp 60-schedulers.rules /etc/udev/rules.d/
 
 * Bootloader
 	bootctl install
-	cp /home/jonatas/dotfiles/arch.conf /boot/loader/entries/
+	cp arch.conf /boot/loader/entries/
 	vim /boot/loader/loader.conf
 		timeout	3
 		default arch
@@ -67,23 +68,32 @@
 	pacman -S xorg-server xorg-server-utils xorg-xinit xorg-utils alsa-utils pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
 	- intel
 		pacman -S xf86-video-intel lib32-mesa-libgl libva-intel-driver libva xf86-input-synaptics
-	-nvidia
+	- nvidia
 		pacman -S nvidia lib32-nvidia-libgl
-	pacman -S i3 xfce4-terminal rofi
+	pacman -S i3 xfce4-terminal rofi zsh zsh-completions yaourt wget firefox flashplugin tmux powerline powerline-fonts feh lxappearance compton ttf-inconsolata maim imagemagick
 	mkdir -p /home/jonatas/.config/i3
-	cd /home/jonatas/dotfiles
-	cp i3config toggle_touchpad.sh ../.config/i3/
+	cp i3config i3blocks.conf i3lock-wrapper.sh ../.config/i3/
+	cp -R scripts  ../.config/i3
 	mv ../.config/i3/i3config ../.config/i3/config
-	cp .xinitrc .X* ../
-	cp 50-synaptics.conf /etc/X11/xorg.conf.d/
-	chown -R jonatas /home/jonatas/dotfiles
+	mkdir -p ../.config/xfce4/terminal
+	cp terminalrc ../.config/xfce4/terminal
+	- touchpad
+		cp toggle_touchpad.sh ../.config/i3/
+		cp 50-synaptics.conf /etc/X11/xorg.conf.d/
+	cp .wallpaper.jpg .xinitrc .X* ../
 	alsamixer
-	systemctl enable netctl-auto@interface.service #interface
+	- hdmi
+		cp default.pa ..//.config/pulse/
+	systemctl enable dhcpcd@interface.service #interface
+	-wireless
+		systemctl enable netctl-auto@interface.service #interface
+	chown -R jonatas /home/jonatas/dotfiles
 
 * Software
-	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin tmux powerline powerline-fonts feh lxappearance compton ttf-font-awesome ttf-inconsolata
+	pacman -S mpv steam
 	
-	yaourt i3blocks
+	yaourt i3blocks ttf-font-awesome 
+
 * Finish
 	exit
 	cp /etc/netctl/profile /mnt/etc/netctl/ #profile
@@ -99,9 +109,9 @@
 
 * Firefox
 	mkdir /home/jonatas/.mozilla/firefox/profile.default/chrome		#profile
-	cp /home/jonatas/dotfiles/userChrome.css /home/jonatas/.mozilla/firefox/profile.default/chrome/
+	cp userChrome.css ../.mozilla/firefox/profile.default/chrome/
 	yaourt gtk-theme-numix-solarized
-	cp /home/jonatas/dotfiles/.vimperator/ /home/jonatas/
+	cp -R .vimperator/ ../
 
 * psd
 	yaourt profile-sync-daemon

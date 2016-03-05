@@ -232,17 +232,17 @@
         -moz-image-region: rect(0, 0, 0, 0) !important;
     }
     
-    #liberator-completions, #liberator-bottombar-deck { background: var(--bg-dark) !important; }
+    /*#liberator-completions, #liberator-bottombar-deck { background: var(--bg-dark) !important; }*/
 
     /* Tabgroup margin top fix */
     #tab-view-deck #tab-view { margin: 24px 12px 12px 12px !important; }
     #tab-view-deck { background: var(--bg-light) !important; }
     
-    window[sizemode="fullscreen"] #liberator-statusline { display: none !important; }
+    /*window[sizemode="fullscreen"] #liberator-statusline { display: none !important; }
     window[sizemode="fullscreen"] #liberator-bottombar  {
         margin-top: -24px !important;
         transition: 1s ease !important; transition-delay: .3s !important;
-    }
+    }*/
     /*window[sizemode="fullscreen"] #browser-panel        { margin-top: -1px !important; }*/
 }
 
