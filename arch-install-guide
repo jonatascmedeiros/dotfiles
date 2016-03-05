@@ -64,7 +64,7 @@
 		blacklist	rtl8xxxu
 	
 * Desktop
-	pacman -S xorg-server xorg-server-utils xorg-xinit alsa-utils pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
+	pacman -S xorg-server xorg-server-utils xorg-xinit xorg-utils alsa-utils pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
 	- intel
 		pacman -S xf86-video-intel lib32-mesa-libgl libva-intel-driver libva xf86-input-synaptics
 	-nvidia
@@ -75,13 +75,15 @@
 	cp i3config toggle_touchpad.sh ../.config/i3/
 	mv ../.config/i3/i3config ../.config/i3/config
 	cp .xinitrc .X* ../
-	chown -R jonatas /home/joantas/dotfiles
+	cp 50-synaptics.conf /etc/X11/xorg.conf.d/
+	chown -R jonatas /home/jonatas/dotfiles
 	alsamixer
 	systemctl enable netctl-auto@interface.service #interface
 
 * Software
 	pacman -S zsh zsh-completions yaourt wget firefox mpv steam flashplugin tmux powerline powerline-fonts feh lxappearance compton ttf-font-awesome ttf-inconsolata
-
+	
+	yaourt i3blocks
 * Finish
 	exit
 	cp /etc/netctl/profile /mnt/etc/netctl/ #profile
@@ -94,6 +96,12 @@
 
 	sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 	git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+
+* Firefox
+	mkdir /home/jonatas/.mozilla/firefox/profile.default/chrome		#profile
+	cp /home/jonatas/dotfiles/userChrome.css /home/jonatas/.mozilla/firefox/profile.default/chrome/
+	yaourt gtk-theme-numix-solarized
+	cp /home/jonatas/dotfiles/.vimperator/ /home/jonatas/
 
 * psd
 	yaourt profile-sync-daemon
@@ -108,3 +116,9 @@
 		jonatas ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
 	systemctl --user enable psd.service
 
+* Power management
+	check sound card: lspci -k
+	- Intel
+		sudo cp ~/dotfiles/audio_powersave.conf /etc/modprobe.d/
+	sudo cp ~/dotfiles/suspend@.service /etc/systemd/system/
+	sudo systemctl enable suspend@jonatas.service
