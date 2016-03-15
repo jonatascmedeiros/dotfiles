@@ -1,78 +1,80 @@
 * Mount partitions
-	mount /dev/sdaX /mnt
-	mkdir -p /mnt/{boot,mnt/{bucket,windows}}
-	mount /dev/sdaY /mnt/boot
-	mount /dev/sdaZ /mnt/mnt/bucket
-	mount /dev/sdaW /mnt/mnt/windows
+    mount /dev/sdaX /mnt
+    mkdir -p /mnt/{boot,mnt/{bucket,windows}}
+    mount /dev/sdaY /mnt/boot
+    mount /dev/sdaZ /mnt/mnt/bucket
+    mount /dev/sdaW /mnt/mnt/windows
 
 * Mirrors
-	cd /etc/pacman.d
-	wget 'archlinux.org/mirrorlist/?country=BR' -O mirrorlist.b
-	sed -i 's/^#//' mirrorlist.b
-	rankmirrors -n 4 mirrorlist.b > mirrorlist
-	pacman -Syy
+    cd /etc/pacman.d
+    wget 'archlinux.org/mirrorlist/?country=BR' -O mirrorlist.b
+    sed -i 's/^#//' mirrorlist.b
+    rankmirrors -n 4 mirrorlist.b > mirrorlist
+    pacman -Syy
 
 * Install base
-	pacstrap -i /mnt base base-devel intel-ucode ntfs-3g gvim
+    pacstrap -i /mnt base base-devel intel-ucode ntfs-3g gvim
 
 * fstab
-	genfstab -U /mnt > /mnt/etc/fstab
+    genfstab -U /mnt > /mnt/etc/fstab
 
 * Configuration
-	arch-chroot /mnt /bin/bash
-	
-	vim /etc/locale.gen
-	locale-gen
-	locale > /etc/locale.conf
+    arch-chroot /mnt /bin/bash
 
-	ln -sf /usr/share/zoneinfo/America/Recife /etc/localtime
-	hwclock -wu
+    vim /etc/locale.gen
+    locale-gen
+    locale > /etc/locale.conf
 
-	passwd
-	useradd -m -G wheel jonatas
-	passwd jonatas
-	visudo
+    ln -sf /usr/share/zoneinfo/America/Recife /etc/localtime
+    hwclock -wu
 
-	echo name > /etc/hostname
-	vim /etc/hosts
+    passwd
+    useradd -m -G wheel jonatas
+    passwd jonatas
+    visudo
 
-	pacman -S git
-	git clone https://github.com/jonatascmedeiros/dotfiles.git /home/jonatas/dotfiles
-	cd /home/jonatas/dotfiles/
-	cp pacman.conf /etc/
-	pacman -Syy
-  
-	systemctl enable fstrim.timer
-	cp 60-schedulers.rules /etc/udev/rules.d/
+    echo name > /etc/hostname
+    vim /etc/hosts
+
+    pacman -S git
+    git clone https://github.com/jonatascmedeiros/dotfiles /home/jonatas/dotfiles
+    cd /home/jonatas/dotfiles/
+    cp pacman.conf /etc/
+    pacman -Syy
+
+    systemctl enable fstrim.timer
+    cp 60-schedulers.rules /etc/udev/rules.d/
 
 * Bootloader
-	bootctl install
-	cp arch.conf /boot/loader/entries/
-	vim /boot/loader/loader.conf
-		timeout	3
-		default arch
+    bootctl install
+    cp arch.conf /boot/loader/entries/
+    vim /boot/loader/loader.conf
+	timeout	3
+	default arch
 
 * Wireless
-	pacman -S linux-headers dialog wpa_actiond
-	mkdir /opt/rtl8723au
-	git clone https://github.com/lwfinger/rtl8723au.git /opt/rtl8723au
-	--
-	cd /opt/rtl8723au
-	make
-	make install
-	vim /etc/modprobe.d/r8723au.conf
-		blacklist	r8723au
-		blacklist	rtl8xxxu
-	
+    pacman -S linux-headers dialog wpa_actiond
+    mkdir /opt/rtl8723au
+    git clone https://github.com/lwfinger/rtl8723au /opt/rtl8723au
+    --
+    cd /opt/rtl8723au
+    make
+    make install
+    vim /etc/modprobe.d/r8723au.conf
+	blacklist	r8723au
+	blacklist	rtl8xxxu
+
 * Desktop
-	pacman -S xorg-server xorg-server-utils xorg-xinit xorg-utils alsa-utils pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
-	- intel
-		pacman -S xf86-video-intel lib32-mesa-libgl libva-intel-driver libva xf86-input-synaptics
 	- nvidia
-		pacman -S nvidia lib32-nvidia-libgl
-	pacman -S i3 xfce4-terminal rofi zsh zsh-completions yaourt wget firefox flashplugin tmux powerline powerline-fonts feh lxappearance compton ttf-inconsolata maim imagemagick
+		pacman -S nvidia lib32-nvidia-libgl xorg-server-utils xorg-utils xorg-xinit
+	-intel
+		pacman -S xf86-video-intel lib32-mesa-libgl libva-intel-driver libva xorg-server xorg-server-utils xorg-utils xorg-xinit
+	pacman -S alsa-utils pulseaudio-alsa lib32-libpulse lib32-alsa-plugins
+	- touchpad
+		pacman -S xf86-input-synaptics
+	pacman -S i3 xfce4-terminal rofi zsh zsh-completions yaourt wget firefox flashplugin tmux feh lxappearance compton maim imagemagick autojump
 	mkdir -p /home/jonatas/.config/i3
-	cp i3config i3blocks.conf i3lock-wrapper.sh ../.config/i3/
+	cp i3config i3blocks.conf i3lock-wrapper ../.config/i3/
 	cp -R scripts  ../.config/i3
 	mv ../.config/i3/i3config ../.config/i3/config
 	mkdir -p ../.config/xfce4/terminal
@@ -80,55 +82,69 @@
 	- touchpad
 		cp toggle_touchpad.sh ../.config/i3/
 		cp 50-synaptics.conf /etc/X11/xorg.conf.d/
-	cp .wallpaper.jpg .xinitrc .X* ../
-	alsamixer
+	cp .dir_colors .wallpaper.jpg .xinitrc .X* .zshrc .vimrc .vimperatorrc ../
+    	cp -R .vimperator/ ../
+	cp comton.conf ../.config/
+	mkdir -p ../.config/fontconfig
+	cp fonts.conf ../.config/fontconfig/
 	- hdmi
 		cp default.pa ..//.config/pulse/
-	systemctl enable dhcpcd@interface.service #interface
-	-wireless
+    	alsamixer
+    	systemctl enable dhcpcd@interface.service #interface
+    	-wireless
 		systemctl enable netctl-auto@interface.service #interface
-	chown -R jonatas /home/jonatas/dotfiles
+    	chown -R jonatas /home/jonatas/dotfiles
 
 * Software
-	pacman -S mpv steam
-	
-	yaourt i3blocks ttf-font-awesome 
+    pacman -S mpv steam
+
+    yaourt i3blocks ttf-font-awesome paper-icon-theme-git vit powerline-fonts 
 
 * Finish
-	exit
-	cp /etc/netctl/profile /mnt/etc/netctl/ #profile
-	umount -R /mnt
-	reboot
+    exit
+    cp /etc/netctl/profile /mnt/etc/netctl/ #profile
+    umount -R /mnt
+    reboot
 
 * Pos-install
-	sudo pacman -S gnome-common # for iio-sensor
-	yaourt iio-sensor-proxy
+    sudo pacman -S gnome-common # for iio-sensor
+    yaourt iio-sensor-proxy
 
 	sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
-	git clone https://github.com/VundleVim/Vundle.vim.git ~/.vim/bundle/Vundle.vim
+	mkdir -p .vim/bundle/
+	git clone https://github.com/tpope/pathogen
+	cp -R vim-pantheon/autoload/ .vim/
+	git clone https://github.com/vim-airline/vim-airline ~/.vim/bundle/vim-airline
+	git clone https://github.com/altercation/vim-colors-solarized ~/.vim/bundle/vim-colors-solarized
+	git clone https://github.com/vim-airline/vim-airline-themes ~/.vim/bundle/vim-airline-themes
+
+	cp .gitconfig ../
+    git config --global user.email "email" #email
+    git config --global user.name "name" #name
+    git config --global credential.helper cache
+    git config --global credential.helper 'cache --timeout=36000'
 
 * Firefox
-	mkdir /home/jonatas/.mozilla/firefox/profile.default/chrome		#profile
-	cp userChrome.css ../.mozilla/firefox/profile.default/chrome/
-	yaourt gtk-theme-numix-solarized
-	cp -R .vimperator/ ../
+    mkdir /home/jonatas/.mozilla/firefox/profile.default/chrome		#profile
+    cp *.css ../.mozilla/firefox/profile.default/chrome/
+    yaourt gtk-theme-numix-solarized
 
 * psd
-	yaourt profile-sync-daemon
+    yaourt profile-sync-daemon
 
-	mkdir .config/google-chrome/Default/cache
-	mv .cache/google-chrome/Default .config/google-chrome/Default/cache
-	ln -s .config/google-chrome/Default/cache/Default .cache/google-chrome/Default
+    mkdir .config/google-chrome/Default/cache
+    mv .cache/google-chrome/Default .config/google-chrome/Default/cache
+    ln -s .config/google-chrome/Default/cache/Default .cache/google-chrome/Default
 
-	psd
-	vim .config/psd/psd.conf
-	sudo visudo
-		jonatas ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
-	systemctl --user enable psd.service
+    psd
+    vim .config/psd/psd.conf
+    sudo visudo
+	jonatas ALL=(ALL) NOPASSWD: /usr/bin/psd-overlay-helper
+    systemctl --user enable psd.service
 
 * Power management
-	check sound card: lspci -k
-	- Intel
-		sudo cp ~/dotfiles/audio_powersave.conf /etc/modprobe.d/
-	sudo cp ~/dotfiles/suspend@.service /etc/systemd/system/
-	sudo systemctl enable suspend@jonatas.service
+    check sound card: lspci -k
+    - Intel
+	sudo cp ~/dotfiles/audio_powersave.conf /etc/modprobe.d/
+    sudo cp ~/dotfiles/suspend@.service /etc/systemd/system/
+    sudo systemctl enable suspend@jonatas.service
