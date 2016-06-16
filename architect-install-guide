@@ -4,7 +4,7 @@
 // edit pacman.conf (uncomment multilib)
 
 // additional packages
-gvim zsh zsh-completions autojump git wget tmux steam vlc *linux-headers*
+gvim zsh zsh-completions autojump git wget tmux *linux-headers*
 
 // wireless
 git clone https://github.com/lwfinger/rtl8723au /opt/rtl8723au
@@ -22,11 +22,12 @@ git clone https://github.com/jonatascmedeiros/dotfiles
 cd dotfiles
 sudo cp pacman.conf /etc/
 sudo pacman -Syy
-sudo pacman -S intel-ucode yaourt
+sudo pacman -S yaourt
 sudo cp arch.conf /boot/loader/entries/
 sudo cp 60-schedulers.rules /etc/udev/rules.d/
 sudo systemctl enable fstrim.timer   
 yaourt google-chrome otf-inconsolata-dz-powerline
+sudo pacman -S steam guake
 
 sudo pacman -S gnome-common # for iio-sensor
 yaourt iio-sensor-proxy
@@ -34,25 +35,18 @@ yaourt iio-sensor-proxy
 sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
 cp .dir_colors .zshrc .vimrc  ../ 
 
-* Desktop
-	- nvidia
-		pacman -S nvidia lib32-nvidia-libgl xorg-server-utils xorg-utils xorg-xinit
+mkdir -p .vim/bundle/
+git clone https://github.com/tpope/vim-pathogen
+cp -R vim-pantheon/autoload/ .vim/
+git clone https://github.com/vim-airline/vim-airline ~/.vim/bundle/vim-airline
+git clone https://github.com/altercation/vim-colors-solarized ~/.vim/bundle/vim-colors-solarized
+git clone https://github.com/vim-airline/vim-airline-themes ~/.vim/bundle/vim-airline-themes
 
-* Pos-install
-	mkdir -p .vim/bundle/
-	git clone https://github.com/tpope/pathogen
-	cp -R vim-pantheon/autoload/ .vim/
-	git clone https://github.com/vim-airline/vim-airline ~/.vim/bundle/vim-airline
-	git clone https://github.com/altercation/vim-colors-solarized ~/.vim/bundle/vim-colors-solarized
-	git clone https://github.com/vim-airline/vim-airline-themes ~/.vim/bundle/vim-airline-themes
-
-	cp .gitconfig ../
-    git config --global user.email "email" #email
-    git config --global user.name "name" #name
-    git config --global credential.helper cache
-    git config --global credential.helper 'cache --timeout=36000'
-
-    yaourt gtk-theme-numix-solarized
+cp .gitconfig ../
+git config --global user.email "email" #email
+git config --global user.name "name" #name
+git config --global credential.helper cache
+git config --global credential.helper 'cache --timeout=36000'
 
 * psd
     yaourt profile-sync-daemon
