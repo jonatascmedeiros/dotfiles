@@ -8,6 +8,11 @@
 ZSH_THEME="agnoster"
 DEFAULT_USER=$(whoami)
 eval `dircolors /home/jonatas/.dir_colors`
+
+# Base16 Shell
+#BASE16_SHELL="$HOME/.config/base16-shell/base16-solarized.dark.sh"
+#[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
+
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
 
@@ -83,5 +88,5 @@ export EDITOR='vim'
 #
 # Example aliases
 alias zshconfig="vim ~/.zshrc"
-alias buc="cd /mnt/bucket/Manual\ Backup/"
+alias bucket="cd /mnt/bucket/"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
