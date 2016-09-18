@@ -1,7 +1,7 @@
 // ** architect installer (gnome) **
 
 // mount {windows,bucket} partition in /mnt/{windows,bucket}
-// edit pacman.conf (uncomment multilib)
+--// edit pacman.conf (uncomment multilib)
 
 // additional packages
 gvim zsh zsh-completions autojump git wget tmux *linux-headers*
@@ -18,10 +18,10 @@ git clone https://github.com/lwfinger/rtl8723au /opt/rtl8723au
         blacklist	r8723au
         blacklist	rtl8xxxu
 
-git clone https://github.com/jonatascmedeiros/dotfiles
-cd dotfiles
-sudo cp pacman.conf /etc/
-sudo pacman -Syy
+--git clone https://github.com/jonatascmedeiros/dotfiles
+--cd dotfiles
+--sudo cp pacman.conf /etc/
+--sudo pacman -Syy
 sudo pacman -S yaourt
 sudo cp arch.conf /boot/loader/entries/
 sudo cp 60-schedulers.rules /etc/udev/rules.d/

@@ -1,0 +1,49 @@
+loadkeys dvorak
+
+#connect to wireless
+
+timedatectl set-ntp true
+
+parted /dev/sda mklabel gpt mkpart esp fat32 0% 513MiB set 1 boot on name 1 ESP mkpart arch ext4 513MiB 100% name 2 arch
+
+mkfs.vfat -F32 -n ESP /dev/disks/by-partlabel/ESP
+mkfs.ext4 -m 0 -T big -L arch /dev/disks/by-partlabel/arch
+
+mount PARTLABEL=arch /mnt
+mkdir /mnt/boot
+mount PARTLABEL=ESP /mnt/boot
+
+cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
+wget 'archlinux.org/mirrorlist/?country=BR&use_mirror_status=on' -O mirrorlist
+sed -i 's/^#//' /etc/pacman.d/mirrorlist
+
+pacstrap -i /mnt dhcpcd iproute2 iputils linux logrotate man-db man-pages pciutils procps-ng psmisc usbutils base-devel intel-ucode ntfs-3g
+
+genfstab -t PARTLABEL -p /mnt > /mnt/etc/fstab
+
+arch-chroot /mnt /bin/bash
+
+ln -s /usr/share/zoneinfo/America/Recife /etc/localtime
+hwclock -wu
+
+sed -i 's/#en_GB.UTF-8/en_GB.UTF-8/' /etc/locale.gen
+locale-gen
+echo LOCALE=en_GB.UTF-8 > /etc/locale.conf
+
+echo KEYMAP=dvorak > /etc/vconsole.conf
+
+echo myhostname > /etc/hostname
+echo -e "127.0.1.1\tmyhostname.localdomain\tmyhostname" >> /etc/hosts
+
+#network configuration
+systemctl enable dhcpcd@myinterface.service
+
+passwd
+
+bootctl install
+echo -e "default\tarch\ntimeout\t5\neditor\t0" > /boot/loader/loader.conf
+echo -e "title\tArch Linux\nlinux\t/vmlinuz-linux\ninitrd\t/intel-ucode.img\ninitrd\t/initramfs-linux.img\noptions\troot=PARTLABEL=arch rw" > /boot/loader/entries/arch.conf
+
+exit
+umount -R /mnt
+reboot
