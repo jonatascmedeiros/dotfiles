@@ -1,17 +1,23 @@
-loadkeys dvorak
-
 #connect to wireless
 
 timedatectl set-ntp true
 
-parted /dev/sda mklabel gpt mkpart esp fat32 0% 513MiB set 1 boot on name 1 ESP mkpart arch ext4 513MiB 100% name 2 arch
+parted /dev/sda
+	mklabel gpt
+	mkpart esp fat32 0% 129MiB set 1 boot on name 1 ESP
+	mkpart arch ext4 129MiB 131201MiB/65665MiB name 2 arch
+	mkpart msr fat32 131201MiB/65665MiB 131217MiB/65681MiB set 3 msftres on name 3 MSR
+	mkpart windows ntfs 131217MiB/65681MiB 100% set 4 msftdata on name 4 windows
 
-mkfs.vfat -F32 -n ESP /dev/disks/by-partlabel/ESP
-mkfs.ext4 -m 0 -T big -L arch /dev/disks/by-partlabel/arch
+mkfs.vfat -F32 -n ESP /dev/disk/by-partlabel/ESP
+mkfs.ext4 -m 0 -T big -L arch /dev/disk/by-partlabel/arch
+mkfs.vfat -n MSR /dev/disk/by-partlabel/MSR
+mkfs.ntfs -L windows /dev/disk/by-partlabel/windows
 
 mount PARTLABEL=arch /mnt
-mkdir /mnt/boot
+mkdir -p /mnt/{boot,mnt/windows}
 mount PARTLABEL=ESP /mnt/boot
+mount PARTLABEL=windows /mnt/mnt/windows
 
 cp /etc/pacman.d/mirrorlist /etc/pacman.d/mirrorlist.backup
 wget 'archlinux.org/mirrorlist/?country=BR&use_mirror_status=on' -O mirrorlist
@@ -21,6 +27,9 @@ pacstrap -i /mnt dhcpcd iproute2 iputils linux logrotate man-db man-pages pciuti
 
 genfstab -t PARTLABEL -p /mnt > /mnt/etc/fstab
 
+cp /etc/pacman.conf /mnt/etc/
+cp /etc/pacman.d/mirrorlist /mnt/etc/pacman.d/
+
 arch-chroot /mnt /bin/bash
 
 ln -s /usr/share/zoneinfo/America/Recife /etc/localtime
@@ -29,8 +38,6 @@ hwclock -wu
 sed -i 's/#en_GB.UTF-8/en_GB.UTF-8/' /etc/locale.gen
 locale-gen
 echo LOCALE=en_GB.UTF-8 > /etc/locale.conf
-
-echo KEYMAP=dvorak > /etc/vconsole.conf
 
 echo myhostname > /etc/hostname
 echo -e "127.0.1.1\tmyhostname.localdomain\tmyhostname" >> /etc/hosts
