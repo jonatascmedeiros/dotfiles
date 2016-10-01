@@ -1,5 +1,5 @@
 # Path to your oh-my-zsh installation.
-  export ZSH=/home/jonatas/.oh-my-zsh
+export ZSH=/home/jonatas/.oh-my-zsh
 
 # Set name of the theme to load.
 # Look in ~/.oh-my-zsh/themes/
@@ -8,10 +8,6 @@
 ZSH_THEME="agnoster"
 DEFAULT_USER=$(whoami)
 eval `dircolors /home/jonatas/.dir_colors`
-
-# Base16 Shell
-#BASE16_SHELL="$HOME/.config/base16-shell/base16-solarized.dark.sh"
-#[[ -s $BASE16_SHELL ]] && source $BASE16_SHELL
 
 # Uncomment the following line to use case-sensitive completion.
 # CASE_SENSITIVE="true"
@@ -33,10 +29,10 @@ eval `dircolors /home/jonatas/.dir_colors`
 # DISABLE_AUTO_TITLE="true"
 
 # Uncomment the following line to enable command auto-correction.
- ENABLE_CORRECTION="true"
+ENABLE_CORRECTION="true"
 
 # Uncomment the following line to display red dots whilst waiting for completion.
- COMPLETION_WAITING_DOTS="true"
+COMPLETION_WAITING_DOTS="true"
 
 # Uncomment the following line if you want to disable marking untracked files
 # under VCS as dirty. This makes repository status check for large repositories
@@ -59,7 +55,7 @@ plugins=(git archlinux autojump fasd systemd tmux vi-mode vagrant taskwarrior)
 
 # User configuration
 
-  export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
+export PATH="/usr/local/sbin:/usr/local/bin:/usr/bin:/usr/bin/site_perl:/usr/bin/vendor_perl:/usr/bin/core_perl"
 # export MANPATH="/usr/local/man:$MANPATH"
 
 source $ZSH/oh-my-zsh.sh
@@ -87,6 +83,6 @@ export EDITOR='vim'
 # For a full list of active aliases, run `alias`.
 #
 # Example aliases
-alias zshconfig="vim ~/.zshrc"
+alias zshc="vim ~/.zshrc"
 alias bucket="cd /mnt/bucket/"
 # alias ohmyzsh="mate ~/.oh-my-zsh"
